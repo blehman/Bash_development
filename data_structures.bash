@@ -39,6 +39,8 @@ twitter_handle["blehman"]=WordCrank
 
 #--reference:
 echo ${twitter_handle["jrmontague"]}
+echo ${!twitter_handle[@]}
+echo ${twitter_handle[@]}
 
 #--loop:
 for i in "${!twitter_handle[@]}"; do
