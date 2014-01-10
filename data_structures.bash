@@ -50,15 +50,15 @@ done
 # date object
 ################
 
-#--create range
+#--create range:
 start_date="2014-01-09 22:00:00";  
 end_date="2014-01-10 22:00:00";  
 
-#--create date objects
+#--create date objects:
 current=$(date -d "${start_date:0:4}${start_date:5:2}${start_date:8:2} ${start_date:11:2}")
 end=$(date -d "${end_date:0:4}${end_date:5:2}${end_date:8:2} ${end_date:11:2}")
 
-#--loop
+#--loop:
 while [ "$end" != "$current" ];do
     path=$(date -d "$current" +%Y%m%d.%H)
     year="${path:0:4}"
