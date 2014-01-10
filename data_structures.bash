@@ -75,17 +75,17 @@ done
 # strings  (quote hell) 
 #################
 
-#--create example
-vi prac 
-#
-cat
-bull dog
-cAt and buLL dog
-bull
-dog
-#
-#--create globals
-grep_string="cat\|"'"bull dog"'
-grep_option1='-i -E'
-grep_
+#--quiz: find lines in prac that contain cat OR bull dog
 
+#--create globals
+grep_string1="cat|'bull dog'"
+grep_opt1='-i -E'
+grep_string2="cat\|'bull dog'"
+grep_opt2='-i -e'
+
+#--eval
+cmd='cat prac | grep '"$grep_opt1 \"$grep_string1\""
+eval $cmd
+
+#--back tic (broken)
+echo `grep $grep_opt2 "$grep_string2" prac`
