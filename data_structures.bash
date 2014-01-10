@@ -80,11 +80,12 @@ vi prac
 #
 cat
 bull dog
-cat and bull dog
+cAt and buLL dog
 bull
 dog
 #
-#--
+#--create globals
 grep_string="cat\|"'"bull dog"'
-
+grep_option1='-i -E'
+grep_
 
