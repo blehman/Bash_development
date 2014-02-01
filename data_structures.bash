@@ -116,5 +116,29 @@ if $post_proc; then
             else
                 echo "   No $grep_rules_file found."
             fi
-    fi
+fi
+
+
+##create example
+
+#why doesn't this string print out the username?
+curl -v -X POST -ustephen@gnip.com "https://api.gnip.com/replay/rules.json" -d '{"rules":[{"value":"from:$username"}]}'
+## resulted in a rule with value: from:$username
+
+#Solution:
+curl -v -X POST -ustephen@gnip.com "https://api.gnip.comreplay/rules.json" -d '{"rules":[{"value":"from:'"$username"'"}]}'
+##resulted in the correct rule with value: from:compston
+
+##Talk about
+if $post_proc; then
+            echo "creating post proc timelines..."
+            for tmp in `find ${output} -name "${pub}.*filter.piped" | awk -F'/' '{print $NF}'`; do 
+                # max procs at a time
+                procName=$date2tl
+                waitForNProcs
+                echo "   processing $tmp..."
+                $CAT $tmp | cut -d"|" -f2 | sed 's/T/ /g' | sed 's/+00:00//g' | sed 's/.000Z//g' | sort | $time_window -s"${start_date}" -e"${end_date}"  > $output/${tmp}.timeline.csv 
+                $CAT $output/${tmp}.timeline.csv | $date2tl -b${buckets} > $output/${tmp}.timeline.csv.${bucket_label}.csv &            
+            done
+        fi
 
