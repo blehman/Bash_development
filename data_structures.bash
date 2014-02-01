@@ -78,14 +78,43 @@ done
 #--quiz: find lines in prac that contain cat OR bull dog
 
 #--create globals
-grep_string1="cat|'bull dog'"
-grep_opt1='-i -E'
-grep_string2="cat\|'bull dog'"
-grep_opt2='-i -e'
+grep_cmd1='grep -i -E "cat|bull dog"'       # cat
+grep_cmd2='grep -i -E "cat'"'"'s|bull dog"'  # cat's
+cmd1="cat prac | ${grep_cmd1}"
+cmd2="cat prac | ${grep_cmd2}"
 
 #--eval
-cmd='cat prac | grep '"$grep_opt1 \"$grep_string1\""
-eval $cmd
+eval $cmd1
+eval $cmd2
 
-#--back tic (broken)
-echo `grep $grep_opt2 "$grep_string2" prac`
+#--back tic 
+echo `eval $cmd1` # be careful with back tics 
+
+#--back tic vs eval
+pwd
+eval pwd
+echo `pwd`
+`pwd`       #notice error
+
+$USER       #notice error
+echo $USER
+
+#--read 
+if $post_proc; then
+        echo "running post-processing grep rules"
+        tmp=${pub}.agg.piped
+            if [ -f $grep_rules ]; then
+                while read line; do
+                    # max procs at a time
+                    procName="grep"
+                    waitForNProcs
+                    echo "file: $tmp for rule: $line"
+                    ruleToFileNameSegment
+                    cmd="$CAT $tmp | $line > $output/${pub}.agg.piped.${timeline_2nd_filter}.${rname}.filter.piped &"
+                    eval $cmd
+                done < $grep_rules_file
+            else
+                echo "   No $grep_rules_file found."
+            fi
+    fi
+
