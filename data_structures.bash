@@ -75,8 +75,17 @@ done
 # strings  (quote hell) 
 #################
 
-#--quiz: find lines in prac that contain cat OR bull dog
+#--hard vs soft quote
+var='$USER'
+echo $var
 
+var="$USER"
+echo $var
+
+#--combine quotes
+var='$USER='"$USER"
+
+#--Example:
 #--create globals
 grep_cmd1='grep -i -E "cat|bull dog"'       # cat
 grep_cmd2='grep -i -E "cat'"'"'s|bull dog"'  # cat's
@@ -94,51 +103,67 @@ echo `eval $cmd1` # be careful with back tics
 pwd
 eval pwd
 echo `pwd`
-`pwd`       #notice error
+`pwd`           #notice error
 
-$USER       #notice error
 echo $USER
+eval "$USER"    #notice error
+echo `$USER`    #notice error
+`$USER`         #notice error
+$USER           #notice error
 
-#--read 
-if $post_proc; then
-        echo "running post-processing grep rules"
-        tmp=${pub}.agg.piped
-            if [ -f $grep_rules ]; then
-                while read line; do
-                    # max procs at a time
-                    procName="grep"
-                    waitForNProcs
-                    echo "file: $tmp for rule: $line"
-                    ruleToFileNameSegment
-                    cmd="$CAT $tmp | $line > $output/${pub}.agg.piped.${timeline_2nd_filter}.${rname}.filter.piped &"
-                    eval $cmd
-                done < $grep_rules_file
-            else
-                echo "   No $grep_rules_file found."
-            fi
-fi
+var=`echo $USER`
+echo $var
+
+var=$USER
+echo $var
+
+#-- quiz #1 
+tmp=twitter.agg.piped
+if [ -f grep_rules.txt ]; then
+    while read line; do                    
+        echo "file: $tmp for rule: $line"
+        eval "$line"
+
+        # -- fix line below -- 
+        #rname="${grep_stmt} | rules_to_file_name.py"
+        # -- fix line above --        
+        rname=$(echo "${grep_stmt}" |./rules_to_file_name.py)
+
+        cmd="cat $tmp | $grep_stmt > twitter.agg.piped.${rname}.filter.piped &"
+        eval "$cmd"
+    done < grep_rules.txt
+else
+    echo "   No grep_rules.txt found."
+fi 
+
+#-- quiz #2 
+# The following string resulted in a rule with value: "from:$USER" ; instead of value: "from:compston"
+curl -v -X POST -ustephen@gnip.com "https://api.gnip.com/replay/rules.json" -d '{"rules":[{"value":"from:$USER"}]}'
 
 
-##create example
 
-#why doesn't this string print out the username?
-curl -v -X POST -ustephen@gnip.com "https://api.gnip.com/replay/rules.json" -d '{"rules":[{"value":"from:$username"}]}'
-## resulted in a rule with value: from:$username
 
-#Solution:
-curl -v -X POST -ustephen@gnip.com "https://api.gnip.comreplay/rules.json" -d '{"rules":[{"value":"from:'"$username"'"}]}'
-##resulted in the correct rule with value: from:compston
 
-##Talk about
-if $post_proc; then
-            echo "creating post proc timelines..."
-            for tmp in `find ${output} -name "${pub}.*filter.piped" | awk -F'/' '{print $NF}'`; do 
-                # max procs at a time
-                procName=$date2tl
-                waitForNProcs
-                echo "   processing $tmp..."
-                $CAT $tmp | cut -d"|" -f2 | sed 's/T/ /g' | sed 's/+00:00//g' | sed 's/.000Z//g' | sort | $time_window -s"${start_date}" -e"${end_date}"  > $output/${tmp}.timeline.csv 
-                $CAT $output/${tmp}.timeline.csv | $date2tl -b${buckets} > $output/${tmp}.timeline.csv.${bucket_label}.csv &            
-            done
-        fi
+
+
+
+
+
+
+
+
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+#-- quiz #1 solution
+rname=$(echo "${grep_stmt}" |./rules_to_file_name.py)
+
+#-- quiz #2 solution
+curl -v -X POST -ustephen@gnip.com "https://api.gnip.comreplay/rules.json" -d '{"rules":[{"value":"from:'"$USER"'"}]}'
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+
+
 
