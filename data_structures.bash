@@ -127,7 +127,6 @@ if [ -f grep_rules.txt ]; then
         # -- fix line below -- 
         #rname="${grep_stmt} | rules_to_file_name.py"
         # -- fix line above --        
-        rname=$(echo "${grep_stmt}" |./rules_to_file_name.py)
 
         cmd="cat $tmp | $grep_stmt > twitter.agg.piped.${rname}.filter.piped &"
         eval "$cmd"
